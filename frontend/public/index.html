@@ -92,11 +92,12 @@
           data.results.forEach(r => {
             const div = document.createElement('div');
             div.className = 'card';
-            div.innerHTML = `<strong>${r.title}</strong><br>${r.snippet || ''}`;
+            // r.snippet now contains HTML with <mark> tags, so we set innerHTML
+            div.innerHTML = `<strong>${r.title}</strong><br>${r.snippet}`;
             qaResults.appendChild(div);
           });
         } else {
-          qaResults.textContent = 'No relevant results found.';
+          qaResults.innerHTML = '<p>No relevant results found.</p>';
         }
       });
 

@@ -9,6 +9,8 @@ const Tesseract = require('tesseract.js');
 require('dotenv').config();
 
 const app = express();
+const morgan = require('morgan');
+app.use(morgan('dev'));
 const PORT = process.env.PORT || 3000;
 
 const MEDIA_DIR = path.join(__dirname, '../data/media');
@@ -107,34 +109,83 @@ app.get('/api/materials', async (req, res) => {
   }
 });
 
-// Simple QA over uploaded content (naive keyword search)
+// Helper function to highlight terms in text
+function highlightTerms(text, terms) {
+  if (!text || !terms.length) return text;
+  // Escape regex special characters in terms
+  const escapedTerms = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  // Create a regex that matches any of the terms (case-insensitive)
+  const regex = new RegExp(`(${escapedTerms.join('|')})`, 'gi');
+  return text.replace(regex, '<mark>$1</mark>');
+}
+
+// Improved QA with phrase matching and highlighted snippets
 app.post('/api/qa', async (req, res) => {
   const { query } = req.body || {};
-  const q = (query || '').toLowerCase();
+  const q = (query || '').toLowerCase().trim();
+  if (!q) {
+    return res.json({ ok: true, results: [] });
+  }
   const words = q.split(/\s+/).filter(Boolean);
   try {
     const materials = await dbModule.db.allAsync(`SELECT * FROM materials`);
     const candidates = materials.map((m) => {
       const t = (m.content || '').toLowerCase();
       let score = 0;
-      words.forEach((w) => { if (w && t.includes(w)) score += 1; });
-      if (q && t.includes(q)) score += 2;
+      // Exact phrase match (whole query) gets a high score
+      if (t.includes(q)) {
+        score += 10;
+      }
+      // Individual word matches
+      words.forEach((w) => {
+        if (w && t.includes(w)) {
+          score += 1;
+        }
+      });
       return { m, score };
     }).filter(x => x.score > 0);
 
+    // Sort by score descending
     candidates.sort((a, b) => b.score - a.score);
-    const results = candidates.slice(0, 3).map(({ m, score }) => {
-      const snippet = (m.content || '').slice(0, 200);
-      return { id: m.id, title: m.originalname, snippet, score };
+    // Take top 3
+    const topCandidates = candidates.slice(0, 3);
+
+    // Build results with highlighted snippets
+    const results = topCandidates.map(({ m, score }) => {
+      const content = m.content || '';
+      // Find a snippet around the first occurrence of the query (if exists) or first word
+      let snippet = '';
+      const lowerContent = content.toLowerCase();
+      let index = lowerContent.indexOf(q);
+      if (index === -1 && words.length > 0) {
+        // Fallback to first word
+        index = lowerContent.indexOf(words[0]);
+      }
+      const start = Math.max(0, index - 100); // Show 100 chars before match
+      const end = Math.min(content.length, index + 200); // Show 200 chars after match
+      snippet = content.slice(start, end);
+      // Add ellipsis if we cut off
+      const prefix = start > 0 ? '...' : '';
+      const suffix = end < content.length ? '...' : '';
+      const highlightedSnippet = highlightTerms(prefix + snippet + suffix, words);
+      return {
+        id: m.id,
+        title: m.originalname,
+        snippet: highlightedSnippet, // HTML with <mark> tags
+        score
+      };
     });
 
-    // Log QA to history
+    // Log QA to history (using the top result's material_id if available)
     const historyId = uuidv4();
     const topMaterialId = results.length > 0 ? results[0].id : null;
-    const answer = results.length > 0 ? results[0].snippet : 'No relevant results found';
+    const answerText = results.length > 0
+      // For logging, we can store the plain text snippet (without highlights) or a summary
+      ? results[0].snippet.replace(/<mark>|<\/mark>/g, '') // Strip tags for plain text
+      : 'No relevant results found';
     await dbModule.db.runAsync(
       `INSERT INTO history (id, material_id, question, answer, createdAt) VALUES (?,?,?,?,?)`,
-      [historyId, topMaterialId, q, answer, new Date().toISOString()]
+      [historyId, topMaterialId, q, answerText, new Date().toISOString()]
     );
 
     res.json({ ok: true, results });
