@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Letty MVP</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      .section { margin-bottom: 24px; }
+      input, textarea, select { padding: 8px; margin: 6px 0; width: 100%; box-sizing: border-box; }
+      button { padding: 10px 16px; }
+      .card { border: 1px solid #ddd; padding: 12px; border-radius: 6px; margin-top: 8px; }
+      .results { margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>Letty MVP</h1>
+    <div class="section" id="upload-section">
+      <h2>Upload Material</h2>
+      <form id="upload-form">
+        <label>Course</label>
+        <input type="text" id="course" placeholder="e.g., Calculus I" />
+        <label>Semester</label>
+        <input type="text" id="semester" placeholder="e.g., Spring 2026" />
+        <label>Year</label>
+        <input type="text" id="year" placeholder="e.g., 2026" />
+        <label>Material Type</label>
+        <input type="text" id="materialType" placeholder="Notes, Video, PDF, etc." />
+        <label>File</label>
+        <input type="file" id="file" />
+        <button type="submit">Upload</button>
+      </form>
+      <div id="upload-status" class="card" style="display:none;"></div>
+    </div>
+    <div class="section" id="qa-section">
+      <h2>Ask a Question</h2>
+      <form id="qa-form">
+        <input type="text" id="qa-query" placeholder="Ask a question about your materials" />
+        <button type="submit">Ask</button>
+      </form>
+      <div class="results" id="qa-results"></div>
+    </div>
+
+    <script>
+      const uploadForm = document.getElementById('upload-form');
+      const uploadStatus = document.getElementById('upload-status');
+      uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        const file = document.getElementById('file').files[0];
+        if (!file) { alert('Please select a file to upload.'); return; }
+        formData.append('file', file);
+        formData.append('course', document.getElementById('course').value);
+        formData.append('semester', document.getElementById('semester').value);
+        formData.append('year', document.getElementById('year').value);
+        formData.append('materialType', document.getElementById('materialType').value);
+
+        uploadStatus.style.display = 'block';
+        uploadStatus.textContent = 'Uploading...';
+        try {
+          const res = await fetch('/api/upload', { method: 'POST', body: formData });
+          const data = await res.json();
+          if (data.ok) {
+            uploadStatus.textContent = 'Upload successful.';
+          } else {
+            uploadStatus.textContent = 'Upload failed';
+          }
+        } catch (err) {
+          uploadStatus.textContent = 'Upload error: ' + err.message;
+        }
+      });
+
+      const qaForm = document.getElementById('qa-form');
+      const qaResults = document.getElementById('qa-results');
+      qaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const q = document.getElementById('qa-query').value;
+        const res = await fetch('/api/qa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q })
+        });
+        const data = await res.json();
+        qaResults.innerHTML = '';
+        if (data.ok && data.results && data.results.length) {
+          data.results.forEach(r => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `<strong>${r.title}</strong><br>${r.snippet || ''}`;
+            qaResults.appendChild(div);
+          });
+        } else {
+          qaResults.textContent = 'No relevant results found.';
+        }
+      });
+    </script>
+  </body>
+  </html>
