@@ -4,6 +4,8 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const pdfParse = require('pdf-parse');
+const Tesseract = require('tesseract.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -52,15 +54,22 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     const db = dbModule.db;
     const id = uuidv4();
     const ext = path.extname(file.originalname).toLowerCase();
-    let content = '';
-    // Naive text extraction for text-like files
-    try {
-      if (['.txt', '.md', '.mdx', '.json'].includes(ext)) {
-        content = fs.readFileSync(file.path, 'utf8');
-      }
-    } catch (e) {
-      console.warn('Text extraction skipped for', file.originalname, e.message);
+  let content = '';
+  // Text extraction for supported file types
+  try {
+    if (['.txt', '.md', '.mdx', '.json'].includes(ext)) {
+      content = fs.readFileSync(file.path, 'utf8');
+    } else if (ext === '.pdf') {
+      const dataBuffer = fs.readFileSync(file.path);
+      const data = await pdfParse(dataBuffer);
+      content = data.text;
+    } else if (['.png', '.jpg', '.jpeg'].includes(ext)) {
+      const result = await Tesseract.recognize(file.path, 'eng');
+      content = result.data.text;
     }
+  } catch (e) {
+    console.warn('Text extraction failed for', file.originalname, e.message);
+  }
 
     const material = {
       id,
