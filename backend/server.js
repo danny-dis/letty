@@ -6,6 +6,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const pdfParse = require('pdf-parse');
 const Tesseract = require('tesseract.js');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;

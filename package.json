@@ -1,0 +1,10 @@
+{
+  "name": "letty",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "install:all": "cd backend && npm install",
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev"
+  }
+}
