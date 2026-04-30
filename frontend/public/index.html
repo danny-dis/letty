@@ -1,86 +1,324 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Letty MVP</title>
-    <style>
-      body { font-family: Arial, sans-serif; margin: 20px; }
-      .section { margin-bottom: 24px; }
-      input, textarea, select { padding: 8px; margin: 6px 0; width: 100%; box-sizing: border-box; }
-      button { padding: 10px 16px; }
-      .card { border: 1px solid #ddd; padding: 12px; border-radius: 6px; margin-top: 8px; }
-      .results { margin-top: 12px; }
-    </style>
-  </head>
-  <body>
-    <h1>Letty MVP</h1>
-    <div class="section" id="upload-section">
-      <h2>Upload Material</h2>
-      <form id="upload-form">
-        <label>Course</label>
-        <input type="text" id="course" placeholder="e.g., Calculus I" />
-        <label>Semester</label>
-        <input type="text" id="semester" placeholder="e.g., Spring 2026" />
-        <label>Year</label>
-        <input type="text" id="year" placeholder="e.g., 2026" />
-        <label>Material Type</label>
-        <input type="text" id="materialType" placeholder="Notes, Video, PDF, etc." />
-        <label>File</label>
-        <input type="file" id="file" />
-        <button type="submit">Upload</button>
-      </form>
-      <div id="upload-status" class="card" style="display:none;"></div>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Letty - Your AI Study Buddy</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="/" class="logo">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">Letty</span>
+      </a>
+      <nav class="nav-links">
+        <button class="nav-btn active" data-section="upload-section">Upload</button>
+        <button class="nav-btn" data-section="materials-section">Materials</button>
+        <button class="nav-btn" data-section="qa-section">Ask</button>
+        <button class="nav-btn" data-section="history-section">History</button>
+      </nav>
     </div>
-    <div class="section" id="materials-section">
-      <h2>Uploaded Materials</h2>
-      <button onclick="loadMaterials()">Refresh List</button>
-      <div id="materials-list"></div>
-    </div>
-    <div class="section" id="qa-section">
-      <h2>Ask a Question</h2>
-      <form id="qa-form">
-        <input type="text" id="qa-query" placeholder="Ask a question about your materials" />
-        <button type="submit">Ask</button>
-      </form>
-      <div class="results" id="qa-results"></div>
-    </div>
+  </header>
 
-    <script>
-      const uploadForm = document.getElementById('upload-form');
-      const uploadStatus = document.getElementById('upload-status');
-      uploadForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        const file = document.getElementById('file').files[0];
-        if (!file) { alert('Please select a file to upload.'); return; }
-        formData.append('file', file);
-        formData.append('course', document.getElementById('course').value);
-        formData.append('semester', document.getElementById('semester').value);
-        formData.append('year', document.getElementById('year').value);
-        formData.append('materialType', document.getElementById('materialType').value);
+  <main class="container">
+    <!-- Upload Section -->
+    <section id="upload-section" class="section active">
+      <div class="section-header">
+        <h1>Upload Study Material</h1>
+        <p class="subtitle">Add notes, videos, PDFs, or any study resource</p>
+      </div>
+      
+      <form id="upload-form" class="upload-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="course">Course</label>
+            <input type="text" id="course" placeholder="e.g., Calculus I" />
+          </div>
+          <div class="form-group">
+            <label for="semester">Semester</label>
+            <input type="text" id="semester" placeholder="e.g., Fall 2024" />
+          </div>
+          <div class="form-group">
+            <label for="year">Year</label>
+            <input type="text" id="year" placeholder="e.g., 2024" />
+          </div>
+          <div class="form-group">
+            <label for="materialType">Material Type</label>
+            <select id="materialType">
+              <option value="notes">Notes</option>
+              <option value="video">Video</option>
+              <option value="audio">Audio</option>
+              <option value="pdf">PDF</option>
+              <option value="image">Image</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group file-upload">
+          <label>File</label>
+          <div class="drop-zone" id="drop-zone">
+            <input type="file" id="file" hidden />
+            <div class="drop-zone-content">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <p class="drop-text">Drag & drop your file here, or <span class="browse">browse</span></p>
+              <p class="file-name" id="file-name"></p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="upload-btn">
+            <span class="btn-text">Upload Material</span>
+            <span class="btn-loading" style="display: none;">
+              <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32"/>
+              </svg>
+              Uploading...
+            </span>
+          </button>
+        </div>
+        
+        <div id="upload-status" class="status" style="display:none;"></div>
+      </form>
+    </section>
 
-        uploadStatus.style.display = 'block';
-        uploadStatus.textContent = 'Uploading...';
-        try {
-          const res = await fetch('/api/upload', { method: 'POST', body: formData });
-          const data = await res.json();
-          if (data.ok) {
-            uploadStatus.textContent = 'Upload successful.';
-            document.getElementById('upload-form').reset();
-            loadMaterials();
-          } else {
-            uploadStatus.textContent = 'Upload failed';
-          }
-        } catch (err) {
-          uploadStatus.textContent = 'Upload error: ' + err.message;
-        }
+    <!-- Materials Section -->
+    <section id="materials-section" class="section">
+      <div class="section-header">
+        <h1>Your Materials</h1>
+        <p class="subtitle">All your uploaded study resources</p>
+        <button class="btn btn-secondary" onclick="loadMaterials()">
+          <svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Refresh
+        </button>
+      </div>
+      
+      <div id="materials-list" class="materials-grid"></div>
+      <div id="materials-empty" class="empty-state" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <h3>No materials yet</h3>
+        <p>Upload your first study material to get started</p>
+      </div>
+    </section>
+
+    <!-- QA Section -->
+    <section id="qa-section" class="section">
+      <div class="section-header">
+        <h1>Ask Letty</h1>
+        <p class="subtitle">Get answers sourced from your study materials</p>
+      </div>
+      
+      <div class="qa-container">
+        <form id="qa-form" class="qa-form">
+          <div class="qa-input-wrapper">
+            <input type="text" id="qa-query" placeholder="Ask a question about your materials..." />
+            <button type="submit" class="btn btn-primary" id="qa-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+        
+        <div class="results" id="qa-results">
+          <div class="empty-state" id="qa-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <h3>Ask a question</h3>
+            <p>Letty will find answers in your uploaded materials</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- History Section -->
+    <section id="history-section" class="section">
+      <div class="section-header">
+        <h1>Question History</h1>
+        <p class="subtitle">Your past questions and answers</p>
+      </div>
+      
+      <div id="history-list" class="history-list"></div>
+      <div id="history-empty" class="empty-state" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <h3>No history yet</h3>
+        <p>Your question history will appear here</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Navigation
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetId = btn.dataset.section;
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(targetId).classList.add('active');
+        
+        if (targetId === 'materials-section') loadMaterials();
+        if (targetId === 'history-section') loadHistory();
       });
+    });
 
-      const qaForm = document.getElementById('qa-form');
-      const qaResults = document.getElementById('qa-results');
-      qaForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const q = document.getElementById('qa-query').value;
+    // File drag and drop
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file');
+    const fileNameDisplay = document.getElementById('file-name');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        updateFileName(e.dataTransfer.files[0].name);
+      }
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) updateFileName(fileInput.files[0].name);
+    });
+
+    function updateFileName(name) {
+      fileNameDisplay.textContent = name;
+      dropZone.querySelector('.drop-text').style.display = 'none';
+      dropZone.querySelector('.upload-icon').style.display = 'none';
+    }
+
+    // Upload form
+    const uploadForm = document.getElementById('upload-form');
+    const uploadStatus = document.getElementById('upload-status');
+    const uploadBtn = document.getElementById('upload-btn');
+    const btnText = uploadBtn.querySelector('.btn-text');
+    const btnLoading = uploadBtn.querySelector('.btn-loading');
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) {
+        showStatus('error', 'Please select a file to upload');
+        return;
+      }
+      
+      btnText.style.display = 'none';
+      btnLoading.style.display = 'inline-flex';
+      uploadBtn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('course', document.getElementById('course').value);
+      formData.append('semester', document.getElementById('semester').value);
+      formData.append('year', document.getElementById('year').value);
+      formData.append('materialType', document.getElementById('materialType').value);
+
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.ok) {
+          showStatus('success', 'Upload successful! Your material has been added.');
+          uploadForm.reset();
+          fileNameDisplay.textContent = '';
+          dropZone.querySelector('.drop-text').style.display = '';
+          dropZone.querySelector('.upload-icon').style.display = '';
+          loadMaterials();
+        } else {
+          showStatus('error', 'Upload failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        showStatus('error', 'Upload error: ' + err.message);
+      } finally {
+        btnText.style.display = '';
+        btnLoading.style.display = 'none';
+        uploadBtn.disabled = false;
+      }
+    });
+
+    function showStatus(type, message) {
+      uploadStatus.style.display = 'block';
+      uploadStatus.className = `status status-${type}`;
+      uploadStatus.textContent = message;
+      setTimeout(() => { uploadStatus.style.display = 'none'; }, 5000);
+    }
+
+    // Load materials
+    async function loadMaterials() {
+      const list = document.getElementById('materials-list');
+      const empty = document.getElementById('materials-empty');
+      list.innerHTML = '';
+      
+      try {
+        const res = await fetch('/api/materials');
+        const data = await res.json();
+        if (data.ok && data.materials.length) {
+          empty.style.display = 'none';
+          data.materials.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'material-card';
+            const typeIcons = { notes: '📝', video: '🎬', audio: '🎧', pdf: '📄', image: '🖼️', other: '📎' };
+            const icon = typeIcons[m.type] || '📎';
+            card.innerHTML = `
+              <div class="material-icon">${icon}</div>
+              <div class="material-info">
+                <h3 class="material-title">${m.originalname}</h3>
+                <div class="material-meta">
+                  <span class="meta-tag">${m.course || 'Uncategorized'}</span>
+                  <span class="meta-tag">${m.semester || ''}</span>
+                  <span class="meta-tag">${m.year || ''}</span>
+                </div>
+                <span class="material-date">${new Date(m.uploadedAt).toLocaleDateString()}</span>
+              </div>
+            `;
+            list.appendChild(card);
+          });
+        } else {
+          list.style.display = 'none';
+          empty.style.display = '';
+        }
+      } catch (err) {
+        list.innerHTML = '<p class="error">Failed to load materials</p>';
+      }
+    }
+
+    // QA form
+    const qaForm = document.getElementById('qa-form');
+    const qaResults = document.getElementById('qa-results');
+    const qaEmpty = document.getElementById('qa-empty');
+
+    qaForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const q = document.getElementById('qa-query').value.trim();
+      if (!q) return;
+
+      qaEmpty.style.display = 'none';
+      qaResults.innerHTML = '<div class="loading-state"><div class="loader"></div><p>Searching your materials...</p></div>';
+
+      try {
         const res = await fetch('/api/qa', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -88,47 +326,69 @@
         });
         const data = await res.json();
         qaResults.innerHTML = '';
+        
         if (data.ok && data.results && data.results.length) {
           data.results.forEach(r => {
-            const div = document.createElement('div');
-            div.className = 'card';
-            // r.snippet now contains HTML with <mark> tags, so we set innerHTML
-            div.innerHTML = `<strong>${r.title}</strong><br>${r.snippet}`;
-            qaResults.appendChild(div);
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.innerHTML = `
+              <div class="result-header">
+                <span class="result-title">${r.title}</span>
+                <span class="result-score">Relevance: ${Math.round(r.score * 10)}%</span>
+              </div>
+              <p class="result-snippet">${r.snippet}</p>
+            `;
+            qaResults.appendChild(card);
           });
         } else {
-          qaResults.innerHTML = '<p>No relevant results found.</p>';
+          qaResults.innerHTML = `
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <h3>No results found</h3>
+              <p>Try rephrasing your question or upload more materials</p>
+            </div>
+          `;
         }
-      });
-
-      async function loadMaterials() {
-        const list = document.getElementById('materials-list');
-        list.innerHTML = 'Loading...';
-        try {
-          const res = await fetch('/api/materials');
-          const data = await res.json();
-          if (data.ok && data.materials.length) {
-            list.innerHTML = '';
-            data.materials.forEach(m => {
-              const div = document.createElement('div');
-              div.className = 'card';
-              div.innerHTML = `
-                <strong>${m.originalname}</strong><br>
-                Course: ${m.course || 'N/A'}<br>
-                Semester: ${m.semester || 'N/A'}<br>
-                Year: ${m.year || 'N/A'}<br>
-                Type: ${m.type || 'N/A'}<br>
-                Uploaded: ${new Date(m.uploadedAt).toLocaleString()}
-              `;
-              list.appendChild(div);
-            });
-          } else {
-            list.textContent = 'No materials uploaded yet.';
-          }
-        } catch (err) {
-          list.textContent = 'Failed to load materials: ' + err.message;
-        }
+      } catch (err) {
+        qaResults.innerHTML = '<p class="error">Error: ' + err.message + '</p>';
       }
-    </script>
-  </body>
-  </html>
+    });
+
+    // Load history
+    async function loadHistory() {
+      const list = document.getElementById('history-list');
+      const empty = document.getElementById('history-empty');
+      list.innerHTML = '';
+      
+      try {
+        const res = await fetch('/api/history');
+        const data = await res.json();
+        if (data.ok && data.history.length) {
+          empty.style.display = 'none';
+          data.history.forEach(h => {
+            const card = document.createElement('div');
+            card.className = 'history-item';
+            card.innerHTML = `
+              <div class="history-question">${h.question}</div>
+              <div class="history-answer">${h.answer}</div>
+              <span class="history-date">${new Date(h.createdAt).toLocaleString()}</span>
+            `;
+            list.appendChild(card);
+          });
+        } else {
+          list.style.display = 'none';
+          empty.style.display = '';
+        }
+      } catch (err) {
+        list.innerHTML = '<p class="error">Failed to load history</p>';
+      }
+    }
+
+    // Load materials on startup
+    loadMaterials();
+  </script>
+</body>
+</html>

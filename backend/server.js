@@ -15,19 +15,19 @@ const PORT = process.env.PORT || 3000;
 
 const MEDIA_DIR = path.join(__dirname, '../data/media');
 const DB_PATH = path.join(__dirname, '../data/letty.db');
-const dbModule = require('./db');
 
+// Ensure directories exist before initializing DB
 function ensureDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
+ensureDir(MEDIA_DIR);
+ensureDir(path.dirname(DB_PATH));
 
+const dbModule = require('./db');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-ensureDir(MEDIA_DIR);
-ensureDir(path.dirname(DB_PATH));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
