@@ -31,6 +31,11 @@
       </form>
       <div id="upload-status" class="card" style="display:none;"></div>
     </div>
+    <div class="section" id="materials-section">
+      <h2>Uploaded Materials</h2>
+      <button onclick="loadMaterials()">Refresh List</button>
+      <div id="materials-list"></div>
+    </div>
     <div class="section" id="qa-section">
       <h2>Ask a Question</h2>
       <form id="qa-form">
@@ -61,6 +66,8 @@
           const data = await res.json();
           if (data.ok) {
             uploadStatus.textContent = 'Upload successful.';
+            document.getElementById('upload-form').reset();
+            loadMaterials();
           } else {
             uploadStatus.textContent = 'Upload failed';
           }
@@ -92,6 +99,35 @@
           qaResults.textContent = 'No relevant results found.';
         }
       });
+
+      async function loadMaterials() {
+        const list = document.getElementById('materials-list');
+        list.innerHTML = 'Loading...';
+        try {
+          const res = await fetch('/api/materials');
+          const data = await res.json();
+          if (data.ok && data.materials.length) {
+            list.innerHTML = '';
+            data.materials.forEach(m => {
+              const div = document.createElement('div');
+              div.className = 'card';
+              div.innerHTML = `
+                <strong>${m.originalname}</strong><br>
+                Course: ${m.course || 'N/A'}<br>
+                Semester: ${m.semester || 'N/A'}<br>
+                Year: ${m.year || 'N/A'}<br>
+                Type: ${m.type || 'N/A'}<br>
+                Uploaded: ${new Date(m.uploadedAt).toLocaleString()}
+              `;
+              list.appendChild(div);
+            });
+          } else {
+            list.textContent = 'No materials uploaded yet.';
+          }
+        } catch (err) {
+          list.textContent = 'Failed to load materials: ' + err.message;
+        }
+      }
     </script>
   </body>
   </html>
