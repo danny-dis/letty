@@ -16,8 +16,6 @@ function ensureDir(p) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
 
-// ensure and init the SQLite DB (async startup)
-dbModule.init().catch(err => { console.error('Failed to init DB', err); });
 
 app.use(cors());
 app.use(express.json());
@@ -47,41 +45,46 @@ app.get('/', (req, res) => {
 
 // Upload endpoint
 app.post('/api/upload', upload.single('file'), async (req, res) => {
-  const { course, semester, year, materialType } = req.body;
-  const file = req.file;
-  if (!file) return res.status(400).json({ ok: false, error: 'No file uploaded' });
-  const db = dbModule.db;
-  const id = uuidv4();
-  const ext = path.extname(file.originalname).toLowerCase();
-  let content = '';
-  // Naive text extraction for text-like files
   try {
-    if (['.txt', '.md', '.mdx', '.json'].includes(ext)) {
-      content = fs.readFileSync(file.path, 'utf8');
+    const { course, semester, year, materialType } = req.body;
+    const file = req.file;
+    if (!file) return res.status(400).json({ ok: false, error: 'No file uploaded' });
+    const db = dbModule.db;
+    const id = uuidv4();
+    const ext = path.extname(file.originalname).toLowerCase();
+    let content = '';
+    // Naive text extraction for text-like files
+    try {
+      if (['.txt', '.md', '.mdx', '.json'].includes(ext)) {
+        content = fs.readFileSync(file.path, 'utf8');
+      }
+    } catch (e) {
+      console.warn('Text extraction skipped for', file.originalname, e.message);
     }
-  } catch (e) {
-    console.warn('Text extraction skipped for', file.originalname, e.message);
+
+    const material = {
+      id,
+      filename: file.filename,
+      originalname: file.originalname,
+      path: file.path,
+      course,
+      semester,
+      year,
+      type: materialType || 'unknown',
+      content,
+      uploadedAt: new Date().toISOString()
+    };
+
+    // insert into SQLite
+    await db.runAsync(
+      `INSERT INTO materials (id, filename, originalname, path, course, semester, year, type, content, uploadedAt) VALUES (?,?,?,?,?,?,?,?,?,?)`,
+      [material.id, material.filename, material.originalname, material.path, material.course, material.semester, material.year, material.type, material.content, material.uploadedAt]
+    );
+    res.json({ ok: true, material });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ ok: false, error: 'Failed to process upload' });
   }
-
-  const material = {
-    id,
-    filename: file.filename,
-    originalname: file.originalname,
-    path: file.path,
-    course,
-    semester,
-    year,
-    type: materialType || 'unknown',
-    content,
-    uploadedAt: new Date().toISOString()
-  };
-
-  // insert into SQLite
-  await db.runAsync(
-    `INSERT INTO materials (id, filename, originalname, path, course, semester, year, type, content, uploadedAt) VALUES (?,?,?,?,?,?,?,?,?,?)`,
-    [material.id, material.filename, material.originalname, material.path, material.course, material.semester, material.year, material.type, material.content, material.uploadedAt]
-  );
-  res.json({ ok: true, material });
 });
 
 // List materials
@@ -114,13 +117,43 @@ app.post('/api/qa', async (req, res) => {
       const snippet = (m.content || '').slice(0, 200);
       return { id: m.id, title: m.originalname, snippet, score };
     });
+
+    // Log QA to history
+    const historyId = uuidv4();
+    const topMaterialId = results.length > 0 ? results[0].id : null;
+    const answer = results.length > 0 ? results[0].snippet : 'No relevant results found';
+    await dbModule.db.runAsync(
+      `INSERT INTO history (id, material_id, question, answer, createdAt) VALUES (?,?,?,?,?)`,
+      [historyId, topMaterialId, q, answer, new Date().toISOString()]
+    );
+
     res.json({ ok: true, results });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Letty MVP backend listening on http://localhost:${PORT}`);
+// Get QA history
+app.get('/api/history', async (req, res) => {
+  try {
+    const history = await dbModule.db.allAsync(`SELECT * FROM history ORDER BY createdAt DESC`);
+    res.json({ ok: true, history });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
 });
+
+// Start server (wait for DB init)
+async function startServer() {
+  try {
+    await dbModule.init();
+    app.listen(PORT, () => {
+      console.log(`Letty MVP backend listening on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+}
+
+startServer();
