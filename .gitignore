@@ -1,6 +1,12 @@
 node_modules/
 frontend/node_modules/
+.data/
 data/
+.DS_Store
+*.log
+*.db
+*.sqlite
+/backend/node_modules/
 .DS_Store
 *.log
 *.db
