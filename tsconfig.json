@@ -1,0 +1,54 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"paths": {
+			"*": ["./*"],
+			"@letty/chord": ["./packages/chord/src/index.ts"],
+			"@letty/chord/bundler": ["./packages/chord/src/bundler.ts"],
+			"@letty/chord/context": ["./packages/chord/src/context/index.ts"],
+			"@letty/chord/delta": ["./packages/chord/src/delta/index.ts"],
+			"@letty/chord/node": ["./packages/chord/src/node.ts"],
+			"@letty/letty-telemetry": ["./packages/telemetry/src/index.ts"],
+			"@letty/letty-telemetry/testing": ["./packages/telemetry/src/testing/index.ts"],
+			"@letty/letty-ai": ["./packages/ai/src/index.ts"],
+			"@letty/letty-ai/oauth": ["./packages/ai/src/oauth.ts"],
+			"@letty/letty-ai/*": ["./packages/ai/src/*.ts", "./packages/ai/src/providers/*.ts"],
+			"@letty/letty-ai/dist/*": ["./packages/ai/src/*"],
+			"@letty/letty-agent-core": ["./packages/agent/src/index.ts"],
+			"@letty/letty-agent-core/harness/session/testing": [
+				"./packages/agent/src/harness/session/testing/index.ts"
+			],
+			"@letty/letty-agent-core/node": ["./packages/agent/src/node.ts"],
+			"@letty/letty-agent-core/*": [
+				"./packages/agent/src/*.ts",
+				"./packages/agent/src/*/index.ts",
+				"./packages/agent/src/*"
+			],
+			"@letty/letty-session-backend-sqlite-node": ["./packages/session-backends/sqlite-node/src/index.ts"],
+			"@letty/letty-coding-agent": ["./packages/coding-agent/src/index.ts"],
+			"@letty/letty-coding-agent/experimental/plugin": [
+				"./packages/coding-agent/src/experimental/plugin.ts"
+			],
+			"@letty/letty-coding-agent/hooks": ["./packages/coding-agent/src/core/hooks/index.ts"],
+			"@letty/letty-coding-agent/*": ["./packages/coding-agent/src/*"],
+			"@letty/letty-protocol": ["./packages/protocol/src/index.ts"],
+			"@letty/letty-protocol/*": ["./packages/protocol/src/*"],
+			"@letty/letty-client": ["./packages/client/src/index.ts"],
+			"@letty/letty-client/unix": ["./packages/client/src/unix.ts"],
+			"@letty/letty-client/*": ["./packages/client/src/*"],
+			"@letty/letty-server": ["./packages/server/src/index.ts"],
+			"@letty/letty-server/unix": ["./packages/server/src/transports/unix/index.ts"],
+			"@letty/letty-server/*": ["./packages/server/src/*"],
+			"typebox": ["./node_modules/typebox"],
+			"@letty/letty-tui": ["./packages/tui/src/index.ts"],
+			"@letty/letty-tui/*": ["./packages/tui/src/*"],
+			"@letty/letty-agent-old": ["./packages/agent-old/src/index.ts"],
+			"@letty/letty-agent-old/*": ["./packages/agent-old/src/*"]
+		}
+	},
+	"include": ["packages/*/src/**/*", "packages/*/test/**/*", "packages/session-backends/*/src/**/*", "packages/session-backends/*/test/**/*", "packages/coding-agent/examples/**/*"],
+	"exclude": ["**/dist/**", "packages/coding-agent/examples/extensions/gondolin/**"]
+}

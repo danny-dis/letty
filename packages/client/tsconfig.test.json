@@ -1,0 +1,17 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"types": ["node", "vitest"],
+		"paths": {
+			"@letty/letty-agent-core": ["../agent/src/index.ts"],
+			"@letty/letty-ai": ["../ai/src/index.ts"],
+			"@letty/letty-ai/*": ["../ai/src/*.ts", "../ai/src/providers/*.ts"],
+			"@letty/letty-protocol": ["../protocol/src/index.ts"],
+			"@letty/letty-telemetry": ["../telemetry/src/index.ts"]
+		}
+	},
+	"include": ["src/**/*.ts", "test/**/*.ts"]
+}

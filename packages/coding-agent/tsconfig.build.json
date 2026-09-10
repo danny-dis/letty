@@ -1,0 +1,20 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"paths": {
+			"@letty/chord": ["../chord/dist/index.d.ts"],
+			"@letty/chord/bundler": ["../chord/dist/bundler.d.ts"],
+			"@letty/chord/node": ["../chord/dist/node.d.ts"],
+			"@letty/letty-agent-core": ["../agent/dist/index.d.ts"],
+			"@letty/letty-agent-core/*": ["../agent/dist/*.d.ts"],
+			"@letty/letty-ai": ["../ai/dist/index.d.ts"],
+			"@letty/letty-ai/*": ["../ai/dist/*.d.ts", "../ai/dist/providers/*.d.ts"],
+			"@letty/letty-tui": ["../tui/dist/index.d.ts"],
+			"@letty/letty-tui/*": ["../tui/dist/*.d.ts", "../tui/dist/components/*.d.ts"]
+		},
+		"rootDir": "./src"
+	},
+	"include": ["src/**/*.ts", "src/**/*.d.ts"],
+	"exclude": ["node_modules", "dist", "src/client", "src/experimental", "src/cli/experimental"]
+}

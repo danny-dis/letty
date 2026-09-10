@@ -1,0 +1,12 @@
+{
+	"extends": "../../../tsconfig.base.json",
+	"compilerOptions": {
+		"baseUrl": "../../..",
+		"noEmit": true,
+		"paths": {
+			"@letty/letty-ai": ["packages/ai/src/index.ts"],
+			"@letty/letty-ai/*": ["packages/ai/src/*"]
+		}
+	},
+	"include": ["./**/*.ts", "../src/**/*.ts"]
+}

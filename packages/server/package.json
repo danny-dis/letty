@@ -1,0 +1,58 @@
+{
+	"name": "@letty/letty-server",
+	"version": "0.0.1",
+	"description": "experimental server package for letty",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./testing": {
+			"types": "./dist/testing/index.d.ts",
+			"import": "./dist/testing/index.js"
+		},
+		"./unix": {
+			"types": "./dist/transports/unix/index.d.ts",
+			"import": "./dist/transports/unix/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"CHANGELOG.md"
+	],
+	"scripts": {
+		"clean": "shx rm -rf dist",
+		"dev": "tsgo -p tsconfig.build.json --watch --preserveWatchOutput",
+		"build": "tsgo -p tsconfig.build.json",
+		"test": "vitest --run",
+		"typecheck": "tsgo -p tsconfig.test.json",
+		"prepublishOnly": "npm run clean && npm run build"
+	},
+	"keywords": [
+		"letty",
+		"server"
+	],
+	"author": "Letty",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/letty/letty.git",
+		"directory": "packages/server"
+	},
+	"engines": {
+		"node": ">=22.19.0"
+	},
+	"dependencies": {
+		"@letty/chord": "^0.0.1",
+		"@letty/letty-agent-core": "^0.0.1",
+		"@letty/letty-protocol": "^0.0.1"
+	},
+	"devDependencies": {
+		"shx": "0.4.0",
+		"vitest": "4.1.9"
+	}
+}

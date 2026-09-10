@@ -1,0 +1,10 @@
+{
+	"name": "@letty/letty-example-plugin",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"peerDependencies": {
+		"@letty/chord": "^0.84.4",
+		"@letty/letty-coding-agent": "^0.84.4"
+	}
+}

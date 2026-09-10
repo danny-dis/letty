@@ -1,0 +1,45 @@
+{
+	"name": "@letty/letty-session-backend-sqlite-node",
+	"version": "0.0.1",
+	"description": "Node sqlite session backend for @letty/letty-agent-core sessions",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"CHANGELOG.md"
+	],
+	"scripts": {
+		"clean": "node -e \"import('node:fs/promises').then(fs=>fs.rm('dist',{recursive:true,force:true}))\"",
+		"build": "tsgo -p tsconfig.build.json && node scripts/copy-migrations.mjs",
+		"bench:session:timing": "vitest bench --config vitest.benchmark.config.ts",
+		"test": "vitest --run",
+		"coverage": "vitest --run --coverage",
+		"prepublishOnly": "npm run clean && npm run build"
+	},
+	"author": "Letty",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/letty/letty.git",
+		"directory": "packages/session-backends/sqlite-node"
+	},
+	"engines": {
+		"node": ">=22.19.0"
+	},
+	"dependencies": {
+		"@letty/letty-ai": "^0.0.1",
+		"@letty/letty-agent-core": "^0.0.1"
+	},
+	"devDependencies": {
+		"@vitest/coverage-v8": "4.1.9",
+		"vitest": "4.1.9"
+	}
+}
