@@ -298,7 +298,9 @@ describe("runtime lane restore", () => {
 		const session = await createSession();
 		await session.mutate((mutator) => mutator.commit([write], BACKGROUND_CONTEXT), BACKGROUND_CONTEXT);
 
-		await expect(restoreLane(session, "main", BACKGROUND_CONTEXT)).rejects.toThrow(`missing ${namespace.slice(3)}`);
+		await expect(restoreLane(session, "main", BACKGROUND_CONTEXT)).rejects.toThrow(
+			`missing ${namespace.slice("letty.".length)}`,
+		);
 	});
 
 	it.each([storedValues.operationMeta("").namespace, storedValues.operationState("").namespace] as const)(
@@ -336,7 +338,7 @@ describe("runtime lane restore", () => {
 			);
 
 			await expect(restoreLane(session, "main", BACKGROUND_CONTEXT)).rejects.toThrow(
-				`missing ${namespace.slice(3)}`,
+				`missing ${namespace.slice("letty.".length)}`,
 			);
 		},
 	);

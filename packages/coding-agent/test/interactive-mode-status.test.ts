@@ -785,7 +785,7 @@ describe("InteractiveMode.showLoadedResources", () => {
 
 		expect(normalizeRenderedOutput(fakeThis.loadedResourcesContainer)).toMatchInlineSnapshot(`
 "[Extensions]
-  @scope/letty-scoped, answer.ts, cli-extension.ts, HazAT/letty-interactive-subagents, HazAT/letty-interactive-subagents:subagents, local-index, letty-markdown-preview, user-index"`);
+  @scope/letty-scoped, answer.ts, cli-extension.ts, HazAT/letty-interactive-subagents, HazAT/letty-interactive-subagents:subagents, letty-markdown-preview, local-index, user-index"`);
 	});
 
 	test("adds more parent folders until local extension labels are unique", () => {
