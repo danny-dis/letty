@@ -1,24 +1,12 @@
-<p align="center">
-  <a href="https://letty.dev">
-    <img alt="letty logo" src="https://letty.dev/logo-auto.svg" width="128">
-  </a>
-</p>
-<p align="center">
-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
-  <a href="https://www.npmjs.com/package/@letty/letty-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@letty/letty-coding-agent?style=flat-square" /></a>
-</p>
+# Letty coding agent
 
-> New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
+> Maintained derivative: [danny-dis/letty](https://github.com/danny-dis/letty) is based on Mario Zechner's [Pi agent](https://github.com/badlogic/pi-mono), with the original MIT notice retained. Copyright (c) 2025 Mario Zechner — see [LICENSE](../../LICENSE).
 
-> **Maintained derivative:** This copy of Letty is maintained by [danny-dis](https://github.com/danny-dis) at [danny-dis/letty](https://github.com/danny-dis/letty). It derives from Mario Zechner's Pi agent ([badlogic/pi-mono](https://github.com/badlogic/pi-mono)) under its MIT license (Copyright (c) 2025 Mario Zechner, see [LICENSE](../../LICENSE)). Links below to `letty.dev`, Discord, npm, and the installer are external resources; this README does not establish who operates them.
+This source checkout—not `letty.dev`, a Discord invite, or an npm listing—is the authority for this fork. Historical reference links below may point to external services; they do not establish who operates them.
 
----
+Letty is a terminal coding agent with built-in file and shell tools, persistent sessions, multiple model providers, and TypeScript extension points. It runs in interactive, print, JSON, and RPC modes and exports an SDK. You can adapt workflows with extensions, skills, prompt templates, themes, and packages rather than modifying core code.
 
-Letty is a minimal terminal coding harness. Adapt letty to your workflows, not the other way around, without having to fork and modify letty internals. Extend it with TypeScript [Extensions](#extensions), [Skills](#skills), [Prompt Templates](#prompt-templates), and [Themes](#themes). Put your extensions, skills, prompt templates, and themes in [Letty Packages](#letty-packages) and share them with others via npm or git.
-
-Letty ships with powerful defaults but skips features like sub agents and plan mode. Instead, you can ask letty to build what you want or install a third party letty package that matches your workflow.
-
-Letty runs in four modes: interactive, print or JSON, RPC for process integration, and an SDK for embedding in your own apps.
+The CLI does not include a built-in OS permission sandbox, subagent orchestration, or plan mode. Those behaviors can be supplied by extensions or external tools, but are not default security or workflow guarantees. See [Security](docs/security.md) and [Containerization](docs/containerization.md).
 
 ## Table of Contents
 
@@ -48,33 +36,22 @@ Letty runs in four modes: interactive, print or JSON, RPC for process integratio
 
 ## Quick Start
 
-```bash
-npm install -g --ignore-scripts @letty/letty-coding-agent
-```
-
-`--ignore-scripts` disables dependency lifecycle scripts during install. Letty does not require install scripts for normal npm installs.
-
-Installer alternative:
+From the source checkout (Node.js 22.19.0+, npm, Git, and Bash/Git Bash required):
 
 ```bash
-curl -fsSL https://letty.dev/install.sh | sh
+git clone https://github.com/danny-dis/letty.git
+cd letty
+npm install --ignore-scripts
+npm run build
+node packages/coding-agent/dist/bundle/cli.js --help
+node packages/coding-agent/dist/bundle/cli.js
 ```
 
-Authenticate with an API key:
+The build fetches model catalogs. `--ignore-scripts` disables dependency install hooks, not the build you explicitly run. After the catalog exists, `npm run build:offline` works without refreshing it. The built CLI's `--help` command does not require a provider key.
 
-```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-letty
-```
+In an interactive session, use `/login` to configure a provider, or provide a supported provider key through your environment. `/model` selects an available model. By default, the model gets four tools: `read`, `write`, `edit`, and `bash`; additional capabilities come from [skills](#skills), [extensions](#extensions), and other customization.
 
-Or use your existing subscription:
-
-```bash
-letty
-/login  # Then select provider
-```
-
-Then just talk to letty. By default, letty gives the model four tools: `read`, `write`, `edit`, and `bash`. The model uses these to fulfill your requests. Add capabilities via [skills](#skills), [prompt templates](#prompt-templates), [extensions](#extensions), or [letty packages](#letty-packages).
+The `letty` commands elsewhere in this reference describe the packaged CLI. From the checkout root, replace `letty` with `node packages/coding-agent/dist/bundle/cli.js`; from another project, use an absolute path to that built CLI. Verify any external installer or npm package's publisher independently; this repo does not assert ownership of `letty.dev` or the `@letty` npm namespace. See [docs/quickstart.md](docs/quickstart.md) for a guided first session.
 
 **Platform notes:** [Windows](docs/windows.md) | [Termux (Android)](docs/termux.md) | [tmux](docs/tmux.md) | [Terminal setup](docs/terminal-setup.md) | [Shell aliases](docs/shell-aliases.md)
 
@@ -693,12 +670,7 @@ MIT — original work Copyright (c) 2025 Mario Zechner (see [LICENSE](../../LICE
 
 ## See Also
 
-- [@letty/letty-ai](https://www.npmjs.com/package/@letty/letty-ai): Core LLM toolkit
-- [@letty/letty-agent-core](https://www.npmjs.com/package/@letty/letty-agent-core): Agent framework
-- [@letty/letty-tui](https://www.npmjs.com/package/@letty/letty-tui): Terminal UI components
-
-<p align="center">
-  <a href="https://letty.dev">letty.dev</a> domain graciously donated by
-  <br /><br />
-  <a href="https://exe.dev"><img src="docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
-</p>
+- [@letty/letty-ai](../ai/README.md): Model providers and streaming API.
+- [@letty/letty-agent-core](../agent/README.md): Agent loop and tool execution.
+- [@letty/letty-tui](../tui/README.md): Terminal UI components.
+- [Repository README](../../README.md) and [security policy](../../SECURITY.md): Ownership, development, and trust boundaries.

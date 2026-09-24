@@ -1,86 +1,32 @@
-# Letty Documentation
+# Letty coding-agent documentation
 
-> **Maintained derivative:** This copy of Letty is maintained by [danny-dis](https://github.com/danny-dis) at [danny-dis/letty](https://github.com/danny-dis/letty). It derives from Mario Zechner's Pi agent ([badlogic/pi-mono](https://github.com/badlogic/pi-mono)) under its MIT license (Copyright (c) 2025 Mario Zechner, see [LICENSE](../../../LICENSE)). References below to `letty.dev`, npm, and the installer are external resources; this page does not establish who operates them.
+> Maintained derivative: [danny-dis/letty](https://github.com/danny-dis/letty) is based on Mario Zechner's [Pi agent](https://github.com/badlogic/pi-mono), with the original MIT notice retained. Copyright (c) 2025 Mario Zechner — see [LICENSE](../../../LICENSE).
 
-Letty is a minimal terminal coding harness. It is designed to stay small at the core while being extended through TypeScript extensions, skills, prompt templates, themes, and letty packages.
+Commands here describe this source checkout. External links in historical reference pages do not establish who operates those services.
 
-## Quick start
+## Start from the repository
 
-Install Letty with npm:
+1. Read the [repository README](../../../README.md) for requirements, package layout, and security boundaries.
+2. Follow the [quickstart](quickstart.md) to build this checkout and run its CLI.
+3. Read the [coding-agent reference](../README.md) for detailed modes, tools, sessions, and flags.
 
-```bash
-npm install -g --ignore-scripts @letty/letty-coding-agent
-```
+The CLI runs with your user's permissions. Project trust does not sandbox tools or extensions. The source can contact `letty.dev` at startup for update/telemetry operations; see [security](security.md) and [environment variables](environment-variables.md) before running an unfamiliar build.
 
-`--ignore-scripts` disables dependency lifecycle scripts during install. Letty does not require install scripts for normal npm installs.
+## Use Letty
 
-On Linux or macOS, you can also use the installer:
+- [Usage](usage.md) — interactive and non-interactive workflows.
+- [Providers](providers.md) and [llama.cpp](llama-cpp.md) — authentication and model setup.
+- [Settings](settings.md), [keybindings](keybindings.md), and [environment variables](environment-variables.md) — configuration.
+- [Sessions](sessions.md), [session format](session-format.md), and [compaction](compaction.md) — persistence and context.
+- [Security](security.md) and [containerization](containerization.md) — trust decisions and isolation options.
 
-```bash
-curl -fsSL https://letty.dev/install.sh | sh
-```
+## Extend and integrate
 
-To uninstall letty itself, use npm for curl and npm installs:
+- [Extensions](extensions.md), [skills](skills.md), [prompt templates](prompt-templates.md), [themes](themes.md), and [packages](packages.md) — customization.
+- [Models](models.md) and [custom providers](custom-provider.md) — provider customization.
+- [SDK](sdk.md), [RPC](rpc.md), [JSON events](json.md), and [TUI](tui.md) — application integrations.
 
-```bash
-npm uninstall -g @letty/letty-coding-agent
-```
+## Platforms and development
 
-For pnpm, Yarn, or Bun installs, use the matching global remove command: `pnpm remove -g @letty/letty-coding-agent`, `yarn global remove @letty/letty-coding-agent`, or `bun uninstall -g @letty/letty-coding-agent`.
-
-Then run it in a project directory:
-
-```bash
-letty
-```
-
-Authenticate with `/login` for subscription providers, or set an API key such as `ANTHROPIC_API_KEY` before starting letty.
-
-For the full first-run flow, see [Quickstart](quickstart.md).
-
-## Start here
-
-- [Quickstart](quickstart.md) - install, authenticate, and run a first session.
-- [Using Letty](usage.md) - interactive mode, slash commands, context files, and CLI reference.
-- [Providers](providers.md) - subscription and API-key setup for built-in providers.
-- [llama.cpp](llama-cpp.md) - run a local router and manage models with `/llama`.
-- [Security](security.md) - project trust, sandbox boundaries, and vulnerability reporting.
-- [Containerization](containerization.md) - sandbox letty with Gondolin, Docker, or OpenShell.
-- [Settings](settings.md) - global and project settings.
-- [Keybindings](keybindings.md) - default shortcuts and custom keybindings.
-- [Sessions](sessions.md) - session management, branching, and tree navigation.
-- [Compaction](compaction.md) - context compaction and branch summarization.
-
-## Customization
-
-- [Extensions](extensions.md) - TypeScript modules for tools, commands, events, and custom UI.
-- [Skills](skills.md) - Agent Skills for reusable on-demand capabilities.
-- [Prompt templates](prompt-templates.md) - reusable prompts that expand from slash commands.
-- [Themes](themes.md) - built-in and custom terminal themes.
-- [Letty packages](packages.md) - bundle and share extensions, skills, prompts, and themes.
-- [Custom models](models.md) - add model entries for supported provider APIs.
-- [Custom providers](custom-provider.md) - implement custom APIs and OAuth flows.
-
-## Programmatic usage
-
-- [SDK](sdk.md) - embed letty in Node.js applications.
-- [RPC mode](rpc.md) - integrate over stdin/stdout JSONL.
-- [JSON event stream mode](json.md) - print mode with structured events.
-- [TUI components](tui.md) - build custom terminal UI for extensions.
-
-## Reference
-
-- [Environment variables](environment-variables.md) - Letty process configuration and session metadata available to bash tools.
-- [Session format](session-format.md) - JSONL session file format, entry types, and SessionManager API.
-
-## Platform setup
-
-- [Windows](windows.md)
-- [Termux on Android](termux.md)
-- [tmux](tmux.md)
-- [Terminal setup](terminal-setup.md)
-- [Shell aliases](shell-aliases.md)
-
-## Development
-
-- [Development](development.md) - local setup, project structure, and debugging.
+- [Windows](windows.md), [Termux](termux.md), [tmux](tmux.md), [terminal setup](terminal-setup.md), and [shell aliases](shell-aliases.md).
+- [Development](development.md) and the repository's [contribution guide](../../../CONTRIBUTING.md).

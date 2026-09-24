@@ -1,105 +1,66 @@
-<p align="center">
-  <a href="https://github.com/danny-dis/letty">
-    <img alt="letty logo" src="https://letty.dev/logo-auto.svg" width="128">
-  </a>
-</p>
-<p align="center">
-  <a href="https://discord.com/invite/3cU7Bz4UPx"><img alt="Discord" src="https://img.shields.io/badge/discord-community-5865F2?style=flat-square&logo=discord&logoColor=white" /></a>
-  <a href="https://www.npmjs.com/package/@letty/letty-coding-agent"><img alt="npm" src="https://img.shields.io/npm/v/@letty/letty-coding-agent?style=flat-square" /></a>
-</p>
+# Letty
 
-> New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](CONTRIBUTING.md).
+> Maintained derivative: [danny-dis/letty](https://github.com/danny-dis/letty) is based on Mario Zechner's [Pi agent](https://github.com/badlogic/pi-mono), with the original MIT notice retained. Copyright (c) 2025 Mario Zechner — see [LICENSE](LICENSE).
 
-# Letty Agent Harness
+Letty is a terminal coding agent and a set of libraries for building agent-driven applications. `danny-dis` maintains this checkout; it is not the original source repository.
 
-> This repository ([danny-dis/letty](https://github.com/danny-dis/letty)) is a derivative of the [Pi agent](https://github.com/badlogic/pi-mono) by Mario Zechner, maintained by `danny-dis`. Original authorship remains with the Pi project. MIT License, Copyright (c) 2025 Mario Zechner — see [LICENSE](LICENSE).
+The coding agent can read and edit files, run commands, use multiple model providers, and keep resumable sessions. It supports interactive use, one-shot output, JSON events, RPC, and an embeddable SDK. Extensions, skills, prompt templates, and themes add behavior without making every workflow a core feature.
 
-This repository is the primary source for this derivative, including its self extensible coding agent.
+## Run from this repository
 
-* **[@letty/letty-coding-agent](packages/coding-agent)**: Interactive coding agent CLI
-* **[@letty/letty-agent-core](packages/agent)**: Agent runtime with tool calling and state management
-* **[@letty/letty-ai](packages/ai)**: Unified multi-provider LLM API (OpenAI, Anthropic, Google, …)
-
-To learn more about Letty, start with this repository and local docs:
-
-* [This repository](https://github.com/danny-dis/letty)
-* [Coding agent CLI reference](packages/coding-agent/README.md)
-* [Local docs index](packages/coding-agent/docs/index.md) and [quickstart](packages/coding-agent/docs/quickstart.md)
-* You can also ask the agent to explain itself
-
-Other Letty links: [website](https://letty.dev), [online documentation](https://letty.dev/docs/latest), [Discord](https://discord.com/invite/3cU7Bz4UPx), and [npm package](https://www.npmjs.com/package/@letty/letty-coding-agent). These external links are not statements about who operates those services.
-
-## All Packages
-
-| Package | Description |
-|---------|-------------|
-| **[@letty/chord](packages/chord)** | Standalone application-composition runtime for services, replicated state, RPC, and plugins |
-| **[@letty/letty-telemetry](packages/telemetry)** | Vendor-neutral telemetry contracts, reference adapter, conformance tests, and typed schemas |
-| **[@letty/letty-ai](packages/ai)** | Unified multi-provider LLM API (OpenAI, Anthropic, Google, etc.) |
-| **[@letty/letty-agent-core](packages/agent)** | Agent runtime with tool calling and state management |
-| **[@letty/letty-coding-agent](packages/coding-agent)** | Interactive coding agent CLI |
-| **[@letty/letty-tui](packages/tui)** | Terminal UI library with differential rendering |
-
-For Slack/chat automation and workflows see the separate [letty/letty-chat](https://github.com/letty/letty-chat) repository.
-
-## Permissions & Containerization
-
-Letty does not include a built-in permission system for restricting filesystem, process, network, or credential access. By default, it runs with the permissions of the user and process that launched it.
-
-If you need stronger boundaries, containerize or sandbox Letty. See [packages/coding-agent/docs/containerization.md](packages/coding-agent/docs/containerization.md) for three patterns:
-
-- **Gondolin extension**: keep `letty` and provider auth on the host while routing built-in tools and `!` commands into a local Linux micro-VM.
-- **Plain Docker**: run the whole `letty` process in a local container for simple isolation.
-- **OpenShell**: run the whole `letty` process in a policy-controlled sandbox.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).
-
-## Development
+Prerequisites: Node.js **22.19.0 or newer**, npm, and Git. From a shell with Bash available (including Git Bash on Windows):
 
 ```bash
-npm install --ignore-scripts  # Install all dependencies without running lifecycle scripts
-npm run build         # Refresh model data, then build all packages
-npm run build:offline # Rebuild using existing model data without network access
-npm run check         # Lint, format, and type check
-./test.sh            # Run tests (skips LLM-dependent tests without API keys)
-./letty-test.sh         # Run letty from sources (can be run from any directory)
+git clone https://github.com/danny-dis/letty.git
+cd letty
+npm install --ignore-scripts
+npm run build
+node packages/coding-agent/dist/bundle/cli.js --help
+node packages/coding-agent/dist/bundle/cli.js
 ```
 
-## Building standalone binaries from release source
+`npm run build` downloads current model catalogs before building the workspaces, so it needs network access. After model data has been generated, `npm run build:offline` rebuilds using the local catalog. The `node` command above runs the built CLI from this checkout; `--help` does not require a provider key. To use a model, authenticate through `/login` or configure a provider key as described in the [quickstart](packages/coding-agent/docs/quickstart.md).
 
-GitHub releases include a versioned source archive covered by the release's `SHA256SUMS` file. Extract it and run the same build script used for the official standalone binaries:
+**Distribution note:** This checkout contains package names and references to `letty.dev`, npm, and Discord inherited from its lineage. Their presence does not establish that `danny-dis` operates those services or publishes those packages. The commands above use this repository directly; verify the publisher before using an external installer or package.
+
+## What is in the repo?
+
+The root `package.json` builds these 11 primary workspaces. Extension examples under `packages/coding-agent/examples/` are additional workspaces.
+
+| Package | Purpose |
+| --- | --- |
+| [Coding agent](packages/coding-agent/README.md) | Terminal CLI, tools, sessions, extensions, and SDK |
+| [AI](packages/ai/README.md) | Provider adapters, model catalogs, streaming, and auth |
+| [Agent core](packages/agent/README.md) | Tool-calling loop, state, and events |
+| [TUI](packages/tui/README.md) | Terminal UI components |
+| [Telemetry](packages/telemetry/README.md) | Vendor-neutral telemetry contracts |
+| [Chord](packages/chord/README.md) | Application composition and service primitives |
+| [SQLite session backend](packages/session-backends/sqlite-node/README.md) | Node SQLite persistence for agent sessions |
+| [Protocol](packages/protocol/README.md) | Framed CBOR protocol for remote sessions |
+| [Client](packages/client/README.md) | Transport-neutral remote-session client |
+| [Server](packages/server/README.md) | Experimental remote-session server |
+| [Evals](packages/evals/README.md) | Evaluation tooling |
+
+For a guided first session, start with the [quickstart](packages/coding-agent/docs/quickstart.md). The [documentation index](packages/coding-agent/docs/index.md) links usage, providers, extension authoring, SDK, and RPC references. Maintainers can consult the [documentation audit facts](docs/DOC_AUDIT_FACTS.md) for the source paths behind these descriptions.
+
+## Develop and verify
 
 ```bash
-VERSION="<release-version>"
-tar -xzf "letty-${VERSION}-source.tar.gz"
-cd "letty-${VERSION}"
-./scripts/build-binaries.sh --offline-model-data --platform linux-x64 --out "$PWD/out"
+npm run check          # Formatting, dependency checks, TypeScript, rebrand guard, smoke check
+./test.sh              # Tests in an isolated home with API credentials removed
+npm run build:offline  # Build against already-generated model data
 ```
 
-The archive includes release model data and native prebuilds. `--offline-model-data` uses that model data without refreshing provider catalogs. The script installs dependencies and builds the executable with its runtime assets; pass `--skip-install` if dependencies are already provided.
+The upstream model catalog changes over time. `npm run build` refreshes it, whereas `build:offline` uses the last generated data. The CI workflow runs build, check, and tests on Ubuntu; a successful local build is not a claim that every test passes on every platform. For focused test commands and contribution rules, see [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md).
 
-## Supply-chain hardening
+## Security and network behavior
 
-We treat npm dependency changes as reviewed code changes.
+The CLI normally has the permissions of the user who launched it. Project trust governs loading project-local configuration and extensions; it is **not** a filesystem, process, or network sandbox. Review untrusted repos and extensions, or use a container or VM. See the [security policy](SECURITY.md) and [containerization guide](packages/coding-agent/docs/containerization.md).
 
-- Direct external dependencies are pinned to exact versions. Internal workspace packages remain version-ranged.
-- `.npmrc` sets `save-exact=true` and `min-release-age=2` to avoid same-day dependency releases during npm resolution.
-- `package-lock.json` is the dependency ground truth. Pre-commit blocks accidental lockfile commits unless `LETTY_ALLOW_LOCKFILE_CHANGE=1` is set.
-- `npm run check` verifies pinned direct deps, native TypeScript import compatibility, and the generated coding-agent shrinkwrap.
-- The published CLI package includes `packages/coding-agent/npm-shrinkwrap.json`, generated from the root lockfile, to pin transitive deps for npm users.
-- Release smoke tests use `npm run release:local` to build, pack, and create isolated npm and Bun installs outside the repo before tagging a release.
-- Local release installs, documented npm installs, and `letty update --self` use `--ignore-scripts` where supported.
-- CI installs with `npm ci --ignore-scripts`, and a scheduled GitHub workflow runs `npm audit --omit=dev` plus `npm audit signatures --omit=dev`.
-- Shrinkwrap generation has an explicit allowlist for dependency lifecycle scripts; new lifecycle-script deps fail checks until reviewed.
+Current source code contacts `letty.dev` for startup version checks and optional install/update telemetry. This repository does **not** claim ownership of that domain. Use `--offline` or `LETTY_OFFLINE=1` to disable those startup operations; `LETTY_SKIP_VERSION_CHECK=1` and `LETTY_TELEMETRY=0` control them separately. These flags do not prevent an authenticated model request you explicitly make.
 
-## License
+## Contributing and license
 
-MIT — see [LICENSE](LICENSE). Copyright (c) 2025 Mario Zechner. This repository is a `danny-dis` maintained derivative of the source project credited above.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before filing issues or PRs; this repo has an approval gate for new contributors. Report sensitive findings using [SECURITY.md](SECURITY.md), not a public exploit report.
 
-<p align="center">
-  <a href="https://letty.dev">letty.dev</a> domain graciously donated by
-  <br /><br />
-  <a href="https://exe.dev"><img src="packages/coding-agent/docs/images/exy.png" alt="Exy mascot" width="48" /><br />exe.dev</a>
-</p>
+MIT. Original work copyright © 2025 Mario Zechner; see [LICENSE](LICENSE). This repository is a maintained derivative, not a claim of original authorship.

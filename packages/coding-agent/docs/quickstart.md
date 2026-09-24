@@ -1,169 +1,56 @@
-# Quickstart
+# Quickstart from danny-dis/letty
 
-This page gets you from install to a useful first letty session.
+> Maintained derivative: [danny-dis/letty](https://github.com/danny-dis/letty) is based on Mario Zechner's [Pi agent](https://github.com/badlogic/pi-mono), with the original MIT notice retained. Copyright (c) 2025 Mario Zechner — see [LICENSE](../../../LICENSE).
 
-> **Maintained derivative:** This copy of Letty is maintained by [danny-dis](https://github.com/danny-dis) at [danny-dis/letty](https://github.com/danny-dis/letty). It derives from Mario Zechner's Pi agent ([badlogic/pi-mono](https://github.com/badlogic/pi-mono)) under its MIT license (Copyright (c) 2025 Mario Zechner, see [LICENSE](../../../LICENSE)). The npm package and installer below are external distribution channels; this page does not establish who operates them.
+This guide runs the source checkout; it does not rely on an external installer or assume that an npm namespace belongs to this maintainer.
 
-## Install
+## Install and build
 
-Letty is distributed as an npm package:
-
-```bash
-npm install -g --ignore-scripts @letty/letty-coding-agent
-```
-
-`--ignore-scripts` disables dependency lifecycle scripts during install. Letty does not require install scripts for normal npm installs.
-
-### Uninstall
-
-Use the package manager that installed letty. The curl installer uses npm globally, so curl and npm installs are removed with npm:
+Use Node.js 22.19.0 or newer, npm, Git, and a Bash-capable shell (Git Bash on Windows):
 
 ```bash
-# curl installer or npm install -g
-npm uninstall -g @letty/letty-coding-agent
-
-# pnpm
-pnpm remove -g @letty/letty-coding-agent
-
-# Yarn
-yarn global remove @letty/letty-coding-agent
-
-# Bun
-bun uninstall -g @letty/letty-coding-agent
+git clone https://github.com/danny-dis/letty.git
+cd letty
+npm install --ignore-scripts
+npm run build
+node packages/coding-agent/dist/bundle/cli.js --help
 ```
 
-Uninstalling letty leaves settings, credentials, sessions, and installed letty packages in `~/.letty/agent/`.
+The build fetches current model catalogs and requires network access. If you have already generated the catalog, `npm run build:offline` builds against the local copy. `npm install --ignore-scripts` prevents dependency lifecycle scripts during installation; it does not prevent scripts you explicitly run later.
 
-Then start letty in the project directory you want it to work on:
+The built CLI uses the code in this checkout; it is not an installed global command. On Windows, run the Bash commands in Git Bash, but use the `node` invocation above for the CLI. To start an interactive session in another project, invoke the built CLI by its absolute path from that project's directory. From the repository root:
 
 ```bash
-cd /path/to/project
-letty
+node packages/coding-agent/dist/bundle/cli.js
 ```
 
-## Authenticate
+## Authenticate and choose a model
 
-Letty can use subscription providers through `/login`, or API-key providers through environment variables or the auth file.
+In an interactive session, run `/login` and select a provider, or supply a supported provider API key in your environment. See [Providers](providers.md) for provider-specific setup. Do not paste credentials into prompts or commit auth files. Use `/model` to select from models available to your configured provider.
 
-### Option 1: subscription login
-
-Start letty and run:
-
-```text
-/login
-```
-
-Then select a provider. Built-in subscription logins include Claude Pro/Max, ChatGPT Plus/Pro (Codex), and GitHub Copilot.
-
-### Option 2: API key
-
-Set an API key before launching letty:
-
-```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-letty
-```
-
-You can also run `/login` and select an API-key provider to store the key in `~/.letty/agent/auth.json`.
-
-See [Providers](providers.md) for all supported providers, environment variables, and cloud-provider setup.
-
-## First session
-
-Once letty starts, type a request and press Enter:
+The default tools include `read`, `write`, `edit`, and `bash`; supported terminals/platforms may offer other tools. Try:
 
 ```text
 Summarize this repository and tell me how to run its checks.
 ```
 
-By default, letty gives the model four tools:
+The agent can read and modify files with your account's permissions. Use a disposable checkout or [container](containerization.md) for untrusted work. Project trust prompts control loading of local settings and extensions, not a sandbox.
 
-- `read` - read files
-- `write` - create or overwrite files
-- `edit` - patch files
-- `bash` - run shell commands
-
-Additional built-in read-only tools (`grep`, `find`, `ls`) are available through tool options. Letty runs in your current working directory and can modify files there. Use git or another checkpointing workflow if you want easy rollback.
-
-## Give letty project instructions
-
-Letty loads context files at startup. Add an `AGENTS.md` file to tell it how to work in a project:
-
-```markdown
-# Project Instructions
-
-- Run `npm run check` after code changes.
-- Do not run production migrations locally.
-- Keep responses concise.
-```
-
-Letty loads:
-
-- `~/.letty/agent/AGENTS.md` for global instructions
-- `AGENTS.md` or `CLAUDE.md` from parent directories and the current directory
-
-If a directory contains `AGENTS.override.md`, Letty loads it instead of `AGENTS.md` or `CLAUDE.md` from that directory.
-
-Restart letty, or run `/reload`, after changing context files.
-
-## Common things to try
-
-### Reference files
-
-Type `@` in the editor to fuzzy-search files, or pass files on the command line:
+## Resume or run without an interactive UI
 
 ```bash
-letty @README.md "Summarize this"
-letty @src/app.ts @src/app.test.ts "Review these together"
+node packages/coding-agent/dist/bundle/cli.js -c                            # Continue latest session
+node packages/coding-agent/dist/bundle/cli.js -p "Summarize this repository" # Print and exit
 ```
 
-Images or text can be pasted with Ctrl+V (Alt+V on Windows); images can also be dragged into supported terminals.
+Interactive commands include `/resume`, `/new`, `/tree`, `/fork`, and `/clone`. For process integration, see [JSON events](json.md), [RPC](rpc.md), and the [SDK](sdk.md). Read the [coding-agent reference](../README.md) for all flags and tools.
 
-### Run shell commands
+## Startup network behavior
 
-In interactive mode:
-
-```text
-!npm run lint
-```
-
-The command output is sent to the model. Use `!!command` to run a command without adding its output to the model context.
-
-### Switch models
-
-Use `/model` or Ctrl+L to choose a model for the current session. Press Ctrl+S in the model picker to save the highlighted model as the startup default. Use `/thinking` to choose a thinking level for the current session, or Ctrl+S in that picker to save the startup default thinking level. Use Shift+Tab to cycle thinking level. Use Ctrl+P / Shift+Ctrl+P to cycle through scoped models.
-
-### Continue later
-
-Sessions are saved automatically:
-
-```bash
-letty -c                  # Continue most recent session
-letty -r                  # Browse previous sessions
-letty --name "my task"    # Set session display name at startup
-letty --session <path|id> # Open a specific session
-```
-
-Inside letty, use `/resume`, `/new`, `/tree`, `/fork`, and `/clone` to manage sessions.
-
-### Non-interactive mode
-
-For one-shot prompts:
-
-```bash
-letty -p "Summarize this codebase"
-cat README.md | letty -p "Summarize this text"
-letty -p @screenshot.png "What's in this image?"
-```
-
-Use `--mode json` for JSON event output or `--mode rpc` for process integration.
+In addition to the model requests you initiate, the source currently checks `letty.dev` for updates and may send install/update telemetry there. This fork does not claim ownership of that service. Pass `--offline` to the built CLI or set `LETTY_OFFLINE=1` to disable those startup operations. `LETTY_SKIP_VERSION_CHECK=1` and `LETTY_TELEMETRY=0` control them separately. See [Security](../../../SECURITY.md) and [environment variables](environment-variables.md).
 
 ## Next steps
 
-- [Using Letty](usage.md) - interactive mode, slash commands, sessions, context files, and CLI reference.
-- [Providers](providers.md) - authentication and model setup.
-- [Settings](settings.md) - global and project configuration.
-- [Keybindings](keybindings.md) - shortcuts and customization.
-- [Letty Packages](packages.md) - install shared extensions, skills, prompts, and themes.
-
-Platform notes: [Windows](windows.md), [Termux](termux.md), [tmux](tmux.md), [Terminal setup](terminal-setup.md), [Shell aliases](shell-aliases.md).
+- [Docs index](index.md): usage, providers, customization, and integration guides.
+- [Contributing](../../../CONTRIBUTING.md): repository workflow and checks.
+- [Repository README](../../../README.md): package map and project identity.

@@ -1,101 +1,45 @@
-# Contributing to letty
+# Contributing to Letty
 
-This guide exists to save both sides time.
+This guide applies to [danny-dis/letty](https://github.com/danny-dis/letty), a maintained derivative described in the [repository README](README.md) under the [MIT license](LICENSE). Changes should be understandable, narrowly scoped, and backed by evidence from this repository.
 
-## Philosophy
+## Before you contribute
 
-First things first: **letty's core is minimal**.
+- Read [AGENTS.md](AGENTS.md) for the repository's code, testing, and Git rules. Review agent-generated changes yourself; you are responsible for what you submit.
+- Prefer an extension when a feature does not need to be built into the core coding agent. See the [extension guide](packages/coding-agent/docs/extensions.md).
+- Check existing issues before opening a new one. Use the repository's issue templates and include a minimal reproduction, expected and actual behavior, affected package, and version or commit.
+- For a security-sensitive issue, use [SECURITY.md](SECURITY.md). Do not post exploit details publicly.
 
-If your feature does not belong in the core, it should be an extension. PRs that bloat the core will likely be rejected.
+## Contributor approval gate
 
-Letty's core exists to be minimal and to be extensible so that it can be influenced and manipulated by extensions.  Even hook points for extensions however should be well considered and discussed to avoid adding unmaintainable bloat and complex interactions.
+The [issue gate](.github/workflows/issue-gate.yml) auto-closes new contributors' issues; the [PR gate](.github/workflows/pr-gate.yml) auto-closes unapproved PRs. Approval is conveyed by a maintainer reply on an issue:
 
-## The One Rule
+- `lgtmi` approves future issues, not PRs.
+- `lgtm` approves future issues and PRs.
 
-**You must understand your code.** If you cannot explain what your changes do and how they interact with the rest of the system, your PR will be closed.
+The command must be at the start of the reply (optionally after `@username` mentions) or at the end. Open an issue and seek `lgtm` approval before submitting a PR. An auto-closed issue may be reviewed, but no response time is guaranteed. Collaborators with write-level access follow the workflow's exemptions.
 
-Using AI to write code is fine. Submitting AI-generated slop without understanding it is not.
+## Work from source
 
-If you use an agent, run it from the `letty` root directory so it picks up `AGENTS.md` automatically. Your agent must follow the rules and guidelines in that file.
-
-## Contribution Gate
-
-All issues and PRs from new contributors are auto-closed by default.
-
-Issues submitted Friday through Sunday are not guaranteed to be reviewed.  If something is urgent, ask on Discord: https://discord.com/invite/3cU7Bz4UPx
-
-Maintainers review auto-closed issues daily and reopen worthwhile ones. Issues that do not meet the quality bar below will not be reopened or receive a reply.
-
-Approval happens through maintainer replies on issues:
-
-- `lgtmi`: your future issues will not be auto-closed
-- `lgtm`: your future issues and PRs will not be auto-closed
-
-The command must be at the start of the reply (optionally after one or more `@username` mentions) or at the end. `lgtmi` does not grant rights to submit PRs. Only `lgtm` grants rights to submit PRs.
-
-## Quality Bar For Issues
-
-If you open an issue, you must use one of the two GitHub issue templates.
-
-If you open an issue, keep it short, concrete, and worth reading.
-
-- Keep it concise. If it does not fit on one screen, it is too long.
-- Write in your own voice (do not use an LLM to generate text, if you must, follow up with a clearly AI labeled comment).
-- State the bug or request clearly.
-- Explain why it matters.
-- If you want to implement the change yourself, say so.
-
-If the issue is real and written well, a maintainer may reopen it or reply with `lgtmi` or `lgtm` in the command position described above.
-
-## Blocking
-
-If you ignore this document twice, or if you spam the tracker with agent-generated issues, your GitHub account will be permanently blocked.
-
-If you send a large volume of issues through automation, your GitHub account will be permanently blocked. No taksies backsies.
-
-## Before Submitting a PR
-
-Do not open a PR unless you have already been approved by a maintainer using `lgtm` in the command position described above.
-
-Before submitting a PR:
+Use Node.js 22.19.0 or newer and a shell with Bash (Git Bash on Windows). From the repository root:
 
 ```bash
+npm install --ignore-scripts
+npm run build
 npm run check
 ./test.sh
 ```
 
-Both must pass.
+`npm run build` fetches live model catalogs; `npm run build:offline` uses existing generated catalog data. `./test.sh` runs tests with credentials removed and an isolated home. If a test fails for environmental or platform reasons, report the exact command, error, platform, and whether a focused test passes; do not silently skip a failing check.
 
-Do not edit `CHANGELOG.md`. Changelog entries are added by maintainers.
+For a focused Vitest test, use the package root and the repository's pinned binary:
 
-If you are adding a new provider to `packages/ai`, see `AGENTS.md` for required tests.
+```bash
+cd packages/ai
+node "$(git rev-parse --show-toplevel)/node_modules/vitest/dist/cli.js" --run test/kimi-catalog-source.test.ts
+```
 
-## Questions?
+Do not edit generated `packages/ai/src/models.generated.ts` by hand. Change its generator, regenerate, and review the output. Follow [AGENTS.md](AGENTS.md) for lockfiles, changelogs, and commits. Changelog entries are added by maintainers.
 
-Ask on [Discord](https://discord.com/invite/nKXTsAcmbT).
+## Submit the change
 
-## FAQ
-
-### Why are new issues and PRs auto-closed?
-
-letty receives more issues than the maintainers can responsibly review in real time. Many reports do not meet the quality bar in this guide or do not follow CONTRIBUTING.md. Some are slung at the repository mindlessly via an agent instead of being reviewed and shaped by the person submitting them. Auto-closing creates a buffer so maintainers can review the tracker on their own schedule and reopen the issues that meet the quality bar.
-
-### Why are weekend issues lower priority?
-
-We triage the tracker during working hours. That means more issues can accumulate over the weekend. Anything submitted Friday through Sunday may be missed or given lower priority in the Monday review queue. If a problem is urgent, ask on Discord and include the short version, a repro, and the relevant logs.
-
-### Why do some issues get no reply?
-
-A reply is maintenance work too. Low-signal issues, unclear reports, duplicates, and issues that do not follow this guide may be closed without discussion. This keeps time available for reproducible bugs, thoughtful requests, and contributors who have done the work to make their report actionable.
-
-### Why not let AI triage everything?
-
-AI can help group duplicates, summarize reports, and spot missing information. It is not trusted to make final maintainer decisions. Polished AI-generated issues can still be wrong, misleading, or expensive to investigate. Human review remains the final gate.
-
-### Is this hostile to contributors?
-
-No. It is a guardrail against burnout and tracker spam. Short, concrete, reproducible issues are welcome. Thoughtful contributions are welcome. Automated slop, entitlement, and large volumes of low-effort reports are not.
-
-## Where can I learn about plans?
-
-Larger changes are discussed in GitHub issues and pull requests on this repository.
+Explain the problem, the behavior changed, and the verification you ran. Keep changes limited to the affected area; include a regression test for code fixes when feasible. Do not use the PR description to claim that the upstream project, external npm packages, `letty.dev`, or a Discord server are operated by this fork unless independently verified.
