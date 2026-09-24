@@ -1,5 +1,7 @@
 # Letty Documentation
 
+> **Maintained derivative:** This copy of Letty is maintained by [danny-dis](https://github.com/danny-dis) at [danny-dis/letty](https://github.com/danny-dis/letty). It derives from Mario Zechner's Pi agent ([badlogic/pi-mono](https://github.com/badlogic/pi-mono)) under its MIT license (Copyright (c) 2025 Mario Zechner, see [LICENSE](../../../LICENSE)). References below to `letty.dev`, npm, and the installer are external resources; this page does not establish who operates them.
+
 Letty is a minimal terminal coding harness. It is designed to stay small at the core while being extended through TypeScript extensions, skills, prompt templates, themes, and letty packages.
 
 ## Quick start

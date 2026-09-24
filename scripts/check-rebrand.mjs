@@ -14,6 +14,14 @@ const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SELF = "scripts/check-rebrand.mjs";
 
 const failures = [];
+const attributionDocs = new Set([
+	join(repoRoot, "README.md"),
+	join(repoRoot, "packages/coding-agent/README.md"),
+	join(repoRoot, "packages/coding-agent/docs/index.md"),
+	join(repoRoot, "packages/coding-agent/docs/quickstart.md"),
+]);
+const attributionLine = /^>.*\bPi agent\b.*https:\/\/github\.com\/badlogic\/pi-mono.*Copyright \(c\) 2025 Mario Zechner.*$/;
+const attributionRules = new Set(["whole-word pi", "whole-word Pi", "upstream repo name"]);
 
 function walk(dir, out = []) {
 	for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -45,15 +53,16 @@ function checkFile(path, rules) {
 		if (path === SELF || SELF_ALLOW.test(path)) continue;
 		if (allowPath?.test(path)) continue;
 		pattern.lastIndex = 0;
-		const match = pattern.exec(text);
-		if (!match) continue;
-		if (allowContent && allowContent.test(match[0])) continue;
-		const lineStart = text.lastIndexOf("\n", match.index - 1) + 1;
-		const lineEnd = text.indexOf("\n", match.index);
-		const line = text.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
-		if (allowLine && allowLine.test(line)) continue;
-		const lineNo = text.slice(0, match.index).split("\n").length;
-		failures.push(`${path}:${lineNo}: ${message} (${JSON.stringify(match[0].slice(0, 60))})`);
+		for (const match of text.matchAll(pattern)) {
+			if (allowContent && allowContent.test(match[0])) continue;
+			const lineStart = text.lastIndexOf("\n", match.index - 1) + 1;
+			const lineEnd = text.indexOf("\n", match.index);
+			const line = text.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+			if (allowLine && allowLine.test(line)) continue;
+			if (attributionDocs.has(path) && attributionRules.has(message) && attributionLine.test(line)) continue;
+			const lineNo = text.slice(0, match.index).split("\n").length;
+			failures.push(`${path}:${lineNo}: ${message} (${JSON.stringify(match[0].slice(0, 60))})`);
+		}
 	}
 }
 
@@ -74,12 +83,12 @@ const textFiles = allFiles.filter((f) => {
 // Allows: third-party sbx-kits docs URL (external repo path, not our branding).
 // CamelCase rule allows Api-family words (ApiKey, apiVersion, ...).
 const SBX_KITS_URL = /sbx-kits-contrib\/tree\/main\/pi/;
-const API_WORD = /api/i;
 for (const file of textFiles) {
 	checkFile(file, [
 		{ pattern: new RegExp(WORD_PI.source, "g"), message: "whole-word pi", allowLine: SBX_KITS_URL },
 		{ pattern: new RegExp(WORD_Pi.source, "g"), message: "whole-word Pi" },
-		{ pattern: /\b\w*(?:Pi[A-Z]|pi[A-Z])\w*/g, message: "camelCase Pi token", allowContent: API_WORD },
+		// Legacy fixture variable in the replaced-session regression; not product branding.
+		{ pattern: /\b\w*(?:Pi[A-Z]|pi[A-Z])\w*/g, message: "camelCase Pi token", allowContent: /api|^stalePiThrows$/i },
 	]);
 }
 

@@ -10,6 +10,8 @@
 
 > New issues and PRs from new contributors are auto-closed by default. Maintainers review auto-closed issues daily. See [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
+> **Maintained derivative:** This copy of Letty is maintained by [danny-dis](https://github.com/danny-dis) at [danny-dis/letty](https://github.com/danny-dis/letty). It derives from Mario Zechner's Pi agent ([badlogic/pi-mono](https://github.com/badlogic/pi-mono)) under its MIT license (Copyright (c) 2025 Mario Zechner, see [LICENSE](../../LICENSE)). Links below to `letty.dev`, Discord, npm, and the installer are external resources; this README does not establish who operates them.
+
 ---
 
 Letty is a minimal terminal coding harness. Adapt letty to your workflows, not the other way around, without having to fork and modify letty internals. Extend it with TypeScript [Extensions](#extensions), [Skills](#skills), [Prompt Templates](#prompt-templates), and [Themes](#themes). Put your extensions, skills, prompt templates, and themes in [Letty Packages](#letty-packages) and share them with others via npm or git.
@@ -391,7 +393,7 @@ Place in `~/.letty/agent/themes/`, `.letty/themes/`, or a [letty package](#letty
 
 ### Letty Packages
 
-Bundle and share extensions, skills, prompts, and themes via npm or git. Find packages on [npmjs.com](https://www.npmjs.com/search?q=keywords%3Api-package) or [Discord](https://discord.com/channels/1456806362351669492/1457744485428629628).
+Bundle and share extensions, skills, prompts, and themes via npm or git. Find packages on [npmjs.com](https://www.npmjs.com/search?q=keywords%3Aletty-package) or [Discord](https://discord.com/channels/1456806362351669492/1457744485428629628).
 
 > **Security:** Letty packages run with full system access. Extensions execute arbitrary code, and skills can instruct the model to perform any action including running executables. Review source code before installing third-party packages.
 
@@ -687,7 +689,7 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines and [docs/developmen
 
 ## License
 
-MIT
+MIT — original work Copyright (c) 2025 Mario Zechner (see [LICENSE](../../LICENSE)). This repository is a derivative maintained by [danny-dis](https://github.com/danny-dis) at [danny-dis/letty](https://github.com/danny-dis/letty), based on the source project credited above.
 
 ## See Also
 

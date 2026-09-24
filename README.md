@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://letty.dev">
+  <a href="https://github.com/danny-dis/letty">
     <img alt="letty logo" src="https://letty.dev/logo-auto.svg" width="128">
   </a>
 </p>
@@ -12,16 +12,22 @@
 
 # Letty Agent Harness
 
-This is the home of the Letty agent harness project including our self extensible coding agent.
+> This repository ([danny-dis/letty](https://github.com/danny-dis/letty)) is a derivative of the [Pi agent](https://github.com/badlogic/pi-mono) by Mario Zechner, maintained by `danny-dis`. Original authorship remains with the Pi project. MIT License, Copyright (c) 2025 Mario Zechner — see [LICENSE](LICENSE).
+
+This repository is the primary source for this derivative, including its self extensible coding agent.
 
 * **[@letty/letty-coding-agent](packages/coding-agent)**: Interactive coding agent CLI
 * **[@letty/letty-agent-core](packages/agent)**: Agent runtime with tool calling and state management
 * **[@letty/letty-ai](packages/ai)**: Unified multi-provider LLM API (OpenAI, Anthropic, Google, …)
 
-To learn more about Letty:
+To learn more about Letty, start with this repository and local docs:
 
-* [Visit letty.dev](https://letty.dev), the project website with demos
-* [Read the documentation](https://letty.dev/docs/latest), but you can also ask the agent to explain itself
+* [This repository](https://github.com/danny-dis/letty)
+* [Coding agent CLI reference](packages/coding-agent/README.md)
+* [Local docs index](packages/coding-agent/docs/index.md) and [quickstart](packages/coding-agent/docs/quickstart.md)
+* You can also ask the agent to explain itself
+
+Other Letty links: [website](https://letty.dev), [online documentation](https://letty.dev/docs/latest), [Discord](https://discord.com/invite/3cU7Bz4UPx), and [npm package](https://www.npmjs.com/package/@letty/letty-coding-agent). These external links are not statements about who operates those services.
 
 ## All Packages
 
@@ -34,7 +40,7 @@ To learn more about Letty:
 | **[@letty/letty-coding-agent](packages/coding-agent)** | Interactive coding agent CLI |
 | **[@letty/letty-tui](packages/tui)** | Terminal UI library with differential rendering |
 
-For Slack/chat automation and workflows see [letty/letty-chat](https://github.com/letty/letty-chat).
+For Slack/chat automation and workflows see the separate [letty/letty-chat](https://github.com/letty/letty-chat) repository.
 
 ## Permissions & Containerization
 
@@ -90,7 +96,7 @@ We treat npm dependency changes as reviewed code changes.
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE). Copyright (c) 2025 Mario Zechner. This repository is a `danny-dis` maintained derivative of the source project credited above.
 
 <p align="center">
   <a href="https://letty.dev">letty.dev</a> domain graciously donated by

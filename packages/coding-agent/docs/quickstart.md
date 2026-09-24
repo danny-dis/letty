@@ -2,6 +2,8 @@
 
 This page gets you from install to a useful first letty session.
 
+> **Maintained derivative:** This copy of Letty is maintained by [danny-dis](https://github.com/danny-dis) at [danny-dis/letty](https://github.com/danny-dis/letty). It derives from Mario Zechner's Pi agent ([badlogic/pi-mono](https://github.com/badlogic/pi-mono)) under its MIT license (Copyright (c) 2025 Mario Zechner, see [LICENSE](../../../LICENSE)). The npm package and installer below are external distribution channels; this page does not establish who operates them.
+
 ## Install
 
 Letty is distributed as an npm package:
